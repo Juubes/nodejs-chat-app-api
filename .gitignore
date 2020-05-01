@@ -3,6 +3,9 @@ index.js
 index.d.ts
 out/
 
+# config
+db-config.json
+
 # Logs
 logs
 *.log
