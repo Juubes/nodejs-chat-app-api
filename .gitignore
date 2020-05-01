@@ -2,10 +2,6 @@
 index.js
 index.d.ts
 
-# idk
-package-lock.json
-
-
 # Logs
 logs
 *.log
