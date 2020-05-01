@@ -1,0 +1,22 @@
+{
+  "name": "nodejs-chat-app-api",
+  "version": "1.0.0",
+  "description": "The backend for the NodeJS chat app.",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juubes/nodejs-chat-app-api.git"
+  },
+  "author": "Juubes",
+  "license": "MIT",
+  "homepage": "https://github.com/Juubes/nodejs-chat-app-api#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.6"
+  }
+}
