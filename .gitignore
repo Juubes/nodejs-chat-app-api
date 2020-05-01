@@ -1,3 +1,7 @@
+# build file
+index.js
+index.d.ts
+
 # Logs
 logs
 *.log
