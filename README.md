@@ -1,7 +1,5 @@
 The backend for the NodeJS chat app.
 
-Build with<br>
-`tsc`
+Build with 'npm install'
 
-and run with<br>
-`node index.js`
+and run with 'npm start'
