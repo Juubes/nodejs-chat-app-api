@@ -7,7 +7,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
 
     res.status(200);
     res.send('Hello world');
-});
+}); 
 
 
 app.listen(8080, () => {
