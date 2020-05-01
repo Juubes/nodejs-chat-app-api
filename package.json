@@ -2,9 +2,10 @@
   "name": "nodejs-chat-app-api",
   "version": "1.0.0",
   "description": "The backend for the NodeJS chat app.",
-  "main": "index.js",
+  "main": "./out/index.js",
+  "module": "AMD",
   "scripts": {
-    "start": "tsc && node index.js"
+    "start": "tsc && node ./out/index.js"
   },
   "repository": {
     "type": "git",
