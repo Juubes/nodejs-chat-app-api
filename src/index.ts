@@ -1,17 +1,25 @@
 import express, { Request, Response, NextFunction } from 'express';
-import session from 'express-session';
 import { check, validationResult } from 'express-validator';
 import multer from 'multer'
 import { chatRouter } from './routers/chat-router'
+import UserHandler from './user-handler';
+
+
+// create database, ensure 'sqlite3' in your package.json
 
 const app = express();
 const formValidator = multer({ limits: { files: 0 } });
 app.use(express.json());
 app.use(formValidator.none());
 
-app.use(session({
-    secret: "kakkaalumella", resave: false, saveUninitialized: false
-}))
+
+
+// Load mysql options from config
+
+const usernameCheck = () => check('username').isLength({ min: 4, max: 15 }).isAlphanumeric().withMessage('bad username')
+const passwordHashCheck = () => check('passwdHash').isHexadecimal().bail().isLength({ max: 64, min: 64 }).withMessage('bad password - use sha256 hash');
+const chatMessageCheck = () => check('message').isLength({ min: 1, max: 100 }).isAscii().unescape().withMessage('bad message');
+
 
 
 app.get('/', (req: Request, res: Response) => {
@@ -20,15 +28,16 @@ app.get('/', (req: Request, res: Response) => {
     // Send static webpage or proxy elsewhere
     // TODO:
 
+    req.session!.lastNumber = req.session!.newNumber;
+    req.session!.newNumber = Math.random();
+
     res.status(200);
-    res.send('Hello world');
+    res.json(req.session!);
 });
 
 
 
-app.post('/user/register', [check('username').isLength({ max: 15, min: 4 }).withMessage('bad length'), check('passwdHash').isHexadecimal().withMessage('invalid password hash')], (req: Request, res: Response) => {
-    console.log(`Username: ${req.body.username}`)
-    console.log(`Password hash: ${req.body.passwdHash}`)
+app.post('/user/register', [usernameCheck, passwordHashCheck], (req: Request, res: Response) => {
 
     const result = validationResult(req);
     if (!result.isEmpty()) {
@@ -36,9 +45,18 @@ app.post('/user/register', [check('username').isLength({ max: 15, min: 4 }).with
         res.send(result.array({ onlyFirstError: true }))
         return;
     }
-    //TODO: Send session token back
+    const { username, passwdHash } = req.body;
 
-    res.sendStatus(200);
+    if (UserHandler.userExists(username)) {
+        res.status(403).send('user already exists');
+        return;
+    }
+
+
+    const sessionToken = UserHandler.register(username, passwdHash);
+    //TODO: Send session token back
+    console.log("Registered user: " + username)
+    res.status(200).json({ sessionToken });
     res.end();
 });
 
@@ -56,14 +74,12 @@ app.use('/user/login', (req, res, next) => {
     next();
 });
 
-app.use('/user/logout', (req, res, next) => {
-
+app.use('/user/logout', [usernameCheck, passwordHashCheck], (req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
 
-
-app.route("/chat").all(chatRouter);
+app.route("/chat").all([usernameCheck, passwordHashCheck], chatRouter);
 
 app.listen(8080, () => {
     console.log('Server started on port ' + 8080)
